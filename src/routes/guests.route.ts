@@ -15,7 +15,7 @@ export async function GuestsRoute (app: FastifyInstance) {
     }
   });
 
-  app.patch('/accept-invite/:id', async (request: FastifyRequest, reply: FastifyReply) => {
+  app.post('/accept-invite/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     const id = (request.params as { id: string }).id;
     try {
       await database('guests')
