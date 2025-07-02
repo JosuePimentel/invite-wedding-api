@@ -2,7 +2,7 @@ import knex, { Knex } from 'knex';
 import 'dotenv/config';
 
 export const config: Knex.Config = {
-  client: 'sqlite3',
+  client: process.env.NODE_ENV === 'development' ? 'sqlite3' : 'pg',
   connection: process.env.NODE_ENV === 'development'
     ? {
       filename: './db/app.db'
