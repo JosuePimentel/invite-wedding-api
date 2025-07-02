@@ -53,4 +53,12 @@ export async function GuestsRoute (app: FastifyInstance) {
       total: response.length
     });
   });
+
+  app.delete('/', async () => {
+    try {
+      await database('guests').select().delete();
+    } catch {
+      throw new Error('Error');
+    }
+  });
 }
