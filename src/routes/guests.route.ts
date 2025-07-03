@@ -6,6 +6,7 @@ export async function GuestsRoute (app: FastifyInstance) {
   app.post('/', async (request: FastifyRequest, reply: FastifyReply) => {
     try {
       const body = request.body as GuestsModel['model'];
+      body.guests = `[${body.guests}, 'X ${body.name}']`;
 
       await database('guests').insert({ ...body });
 
@@ -17,12 +18,15 @@ export async function GuestsRoute (app: FastifyInstance) {
 
   app.post('/accept-invite/:id', async (request: FastifyRequest, reply: FastifyReply) => {
     const id = (request.params as { id: string }).id;
+    const body = request.body as { guests: string };
+
     try {
       await database('guests')
         .select()
         .where('id', id)
         .first()
         .update({
+          guests: JSON.stringify(body.guests),
           accepted: true
         });
     } catch {
