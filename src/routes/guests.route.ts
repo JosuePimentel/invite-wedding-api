@@ -35,10 +35,7 @@ export async function GuestsRoute (app: FastifyInstance) {
   });
 
   app.get('/no-accepted', async (_, reply: FastifyReply) => {
-    const response =
-      await database('guests')
-        .select()
-        .where('accepted', false);
+    const response = await database('guests').select();
 
     reply.send({
       data: response,
