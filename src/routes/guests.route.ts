@@ -65,4 +65,25 @@ export async function GuestsRoute (app: FastifyInstance) {
       throw new Error('Error');
     }
   });
+
+  app.patch('/:id', async (req: FastifyRequest, rep: FastifyReply) => {
+    const body = req.body as GuestsModel['patch'];
+    const id = (req.params as {id: string}).id;
+    try {
+      await database('guests').select().where('id', id).first().update(body);
+      rep.send();
+    } catch {
+      throw new Error('Error');
+    }
+  });
+
+  app.delete('/:id', async (req: FastifyRequest, rep: FastifyReply) => {
+    const id = (req.params as {id: string}).id;
+    try {
+      await database('guests').select().where('id', id).first().delete();
+      rep.status(204).send();
+    } catch {
+      throw new Error('Error');
+    }
+  });
 }
