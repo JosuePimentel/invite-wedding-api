@@ -83,4 +83,22 @@ export async function GuestsRoute (app: FastifyInstance) {
       throw new Error('Error');
     }
   });
+
+  app.get('/list-accepted-guests', async () => {
+    const data = await database('guests').select('guests').where('accepted', true) as GuestsModel['patch'][];
+    const response = data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',');
+    return {
+      data: response,
+      length: response.length
+    };
+  });
+
+  app.get('/list-all-guests', async () => {
+    const data = await database('guests').select('guests') as GuestsModel['patch'][];
+    const response = data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',');
+    return {
+      data: response,
+      length: response.length
+    };
+  });
 }
