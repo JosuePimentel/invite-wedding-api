@@ -95,7 +95,7 @@ export async function GuestsRoute (app: FastifyInstance) {
 
   app.get('/list-all-guests', async () => {
     const data = await database('guests').select('guests') as GuestsModel['patch'][];
-    const response = data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',');
+    const response = data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').filter(g => g.length);
     return {
       data: response,
       length: response.length
