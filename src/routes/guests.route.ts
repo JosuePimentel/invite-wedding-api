@@ -86,14 +86,16 @@ export async function GuestsRoute (app: FastifyInstance) {
 
   app.get('/info-guests', async () => {
     const data = await database('guests').select('guests') as GuestsModel['model'][];
+    const all_guests = data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length);
     const accepted_guests = data.filter(g => g.accepted);
     const guests_go = accepted_guests.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'V');
     const guests_not_go = accepted_guests.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'X');
     return {
-      all_guests: { guests: data, quantity: data.length },
-      accepted_guests: { accepted_guests, quantity: accepted_guests.length },
+      all_guests: { all_guests, quantity: all_guests.length },
       guests_go: { guests_go, quantity: guests_go.length },
-      guests_not_go: { guests_not_go, quantity: guests_not_go }
+      guests_not_go: { guests_not_go, quantity: guests_not_go.length },
+      total_family: data.length, 
+      total_family_accepted: accepted_guests.length
     };
   });
 }
