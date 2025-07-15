@@ -86,20 +86,14 @@ export async function GuestsRoute (app: FastifyInstance) {
 
   app.get('/info-guests', async () => {
     const data = await database('guests').select('guests') as GuestsModel['model'][];
+    const accepted_guests = data.filter(g => g.accepted);
+    const guests_go = accepted_guests.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'V');
+    const guests_not_go = accepted_guests.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'X');
     return {
-      all_guests: data,
-      accepted_guests: data.filter(g => g.accepted),
-      guests_go: data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'V'),
-      guests_not_go: data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'X')
-    };
-  });
-
-  app.get('/list-all-guests', async () => {
-    const data = await database('guests').select('guests') as GuestsModel['model'][];
-    const response = data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').filter(g => g.length);
-    return {
-      data: response,
-      length: response.length
+      all_guests: { guests: data, quantity: data.length },
+      accepted_guests: { accepted_guests, quantity: accepted_guests.length },
+      guests_go: { guests_go, quantity: guests_go.length },
+      guests_not_go: { guests_not_go, quantity: guests_not_go }
     };
   });
 }
