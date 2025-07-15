@@ -84,12 +84,13 @@ export async function GuestsRoute (app: FastifyInstance) {
     }
   });
 
-  app.get('/list-accepted-guests', async () => {
-    const data = await database('guests').select('guests').where('accepted', true) as GuestsModel['model'][];
-    const response = data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'V');
+  app.get('/info-guests', async () => {
+    const data = await database('guests').select('guests') as GuestsModel['model'][];
     return {
-      data: response,
-      length: response.length
+      all_guests: data,
+      accepted_guests: data.filter(g => g.accepted),
+      guests_go: data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'V'),
+      guests_not_go: data.map(guest => guest.guests?.slice(1, guest.guests.length-1).split(',').join(',')).map(g => g!.replace(/^\\?"|\\?"$/g, '').split(',').map(g => g.trim())).join(',').split(',').map(g => g.replace('\"', '')).filter(g => g.length).filter(g => g[0] === 'X')
     };
   });
 
